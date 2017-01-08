@@ -1,0 +1,22 @@
+version: '2'
+services:
+  nginx:
+    image: nginx
+    volumes:
+      - ./data:/usr/share/nginx/html:ro
+    ports:
+      - '8889:80'
+  node:
+    build:
+      context: ./node
+    depends_on:
+      - nginx
+    environment:
+      - NGINX_HOST=nginx
+  # ruby:
+  #   build:
+  #     context: ./ruby
+  #   depends_on:
+  #     - nginx
+  #   environment:
+  #     - NGINX_HOST=nginx

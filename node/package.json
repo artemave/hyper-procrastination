@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "start": "babel-node --max_old_space_size=4096 getAndParseBigJson.js"
+  },
+  "dependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0",
+    "debug": "^2.6.0",
+    "httpism": "^2.7.0"
+  }
+}
