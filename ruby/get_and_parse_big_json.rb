@@ -1,19 +1,17 @@
 require 'bundler'
 Bundler.setup
 
-require 'faraday'
-require 'faraday_middleware'
+require 'json'
 
-url = "http://#{ENV.fetch('NGINX_HOST', 'localhost')}"
+HOST = ENV.fetch('NGINX_HOST', 'localhost')
 
-connection = Faraday.new url do |conn|
-  conn.response :json, content_type: /\bjson$/
-  conn.adapter Faraday.default_adapter
-end
+connection = Net::HTTP.start(HOST, '80')
+request = Net::HTTP::Get.new("http://#{HOST}/citylots.json")
 
-def do_work(connection)
-  response = connection.get 'citylots.json'
-  result = response.body['features'].reduce({}) do |acc, p|
+def do_work(connection, request)
+  response = connection.request(request)
+  json = JSON.parse(response.body)
+  result = json['features'].reduce({}) do |acc, p|
     key = p['properties']['FROM_ST']
 
     acc[key] ||= 0
@@ -26,8 +24,8 @@ end
 
 start_time = Time.now
 
-200.times.map do
-  Thread.new { do_work(connection) }
-end.each(&:join)
+200.times do
+  do_work(connection, request)
+end
 
 puts "Time spent: #{Time.now - start_time}"
