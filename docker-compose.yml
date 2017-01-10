@@ -20,3 +20,8 @@ services:
       - nginx
     environment:
       - NGINX_HOST=nginx
+  go:
+    build:
+      context: ./go
+    depends_on:
+      - nginx
