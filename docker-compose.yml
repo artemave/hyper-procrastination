@@ -12,15 +12,11 @@ services:
       context: ./node
     depends_on:
       - nginx
-    environment:
-      - NGINX_HOST=nginx
   ruby:
     build:
       context: ./ruby
     depends_on:
       - nginx
-    environment:
-      - NGINX_HOST=nginx
   go:
     build:
       context: ./go

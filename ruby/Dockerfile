@@ -5,5 +5,7 @@ WORKDIR /app
 ADD Gemfile* ./
 RUN bundle install
 
+ENV NGINX_HOST=nginx
+
 ADD . .
 CMD [ "ruby", "get_and_parse_big_json.rb" ]
