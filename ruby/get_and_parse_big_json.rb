@@ -1,19 +1,14 @@
 require 'bundler'
 Bundler.setup
 
-require 'faraday'
-require 'faraday_middleware'
+require 'typhoeus'
+require 'json'
 
-url = "http://#{ENV.fetch('NGINX_HOST', 'localhost')}"
+URL = "http://#{ENV.fetch('NGINX_HOST', 'localhost')}/citylots.json"
 
-connection = Faraday.new url do |conn|
-  conn.response :json, content_type: /\bjson$/
-  conn.adapter Faraday.default_adapter
-end
-
-def do_work(connection)
-  response = connection.get 'citylots.json'
-  result = response.body['features'].reduce({}) do |acc, p|
+def process_data(response)
+  data = JSON.parse(response.body)
+  result = data['features'].reduce({}) do |acc, p|
     key = p['properties']['FROM_ST']
 
     acc[key] ||= 0
@@ -26,8 +21,12 @@ end
 
 start_time = Time.now
 
-200.times.map do
-  Thread.new { do_work(connection) }
-end.each(&:join)
+hydra = Typhoeus::Hydra.new
+200.times do
+  request = Typhoeus::Request.new(URL)
+  request.on_complete(&method(:process_data))
+  hydra.queue(request)
+end
+hydra.run
 
 puts "Time spent: #{Time.now - start_time}"
