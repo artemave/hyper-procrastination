@@ -20,7 +20,7 @@ docker-compose run go # node ruby
 
 ## Add more tech
 
-### Rules:
+### Rules
 
 - all files go in a subfolder named after the tech
 - test JSON - `cityloads.json` - should be requested over HTTP from the Nginx container bundled in this project
