@@ -4,11 +4,11 @@ Compares speed of different server-side tech in a following test scenario: reque
 
 Just to give you an idea, on my machine (2015 MBP 13" Core i7) the numbers are as follows:
 
-| Tech | Time Spent    |
-| -------------  | ------------- |
-| Go 1.7         | 14 seconds    |
-| Node 7.4       | 23 seconds    |
-| Ruby 2.4       | 52 seconds    |
+| Tech          | Request time | Parsing time | Processing time | Total time |
+| ------------- | -----------  | ------------ | --------------- | ---------- |
+| Go 1.7        |              |              |                 | 14 s       |
+| Node 7.4      |              |              |                 | 23 s       |
+| Ruby 2.4      | 4.6s         | 34.9s        | 2.25s           | 42.55 s    |
 
 ## See for yourself
 
