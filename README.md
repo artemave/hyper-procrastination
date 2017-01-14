@@ -7,8 +7,8 @@ Just to give you an idea, on my machine (2015 MBP 13" Core i7) the numbers are a
 | Tech          | Request time | Parsing time | Processing time | Total time |
 | ------------- | -----------  | ------------ | --------------- | ---------- |
 | Go 1.7        |              |              |                 | 14 s       |
-| Node 7.4      |              |              |                 | 23 s       |
-| Ruby 2.4      | 4.6s         | 34.9s        | 2.25s           | 42.55 s    |
+| Node 7.4      | 4.35s        | 13.66s       | 0.99s           | 19.01s     |
+| Ruby 2.4      | 4.6s         | 34.9s        | 2.25s           | 42.55s     |
 
 ## See for yourself
 

@@ -17,15 +17,28 @@ function extractData(data) {
   }, {})
 }
 
+let timings = {
+  request: '???', // the naive approach used for the other metrics does not work: it seems to return totalTime * number of tests
+  parse: 0,
+  process: 0,
+}
 let startTime = new Date()
 
 Promise.all(
   Array.apply(null, {length: 200}).map(async () => {
     const response = await getJson()
+
+    let t = new Date()
     const json = JSON.parse(response)
+    timings.parse += new Date() - t
+
+    t = new Date()
     const data = extractData(json)
+    timings.process += new Date() - t
+
     console.log("Some data: " + Object.keys(data).length);
   })
 ).then(() => {
-  console.log(`Time spent: ${new Date() - startTime}ms`);
+  let totalTime = new Date() - startTime
+  console.log(`Time spent: ${timings.request}ms request, ${timings.parse}ms parse, ${timings.process}ms process, ${totalTime}ms total`);
 })
