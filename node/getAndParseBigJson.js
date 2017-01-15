@@ -18,7 +18,7 @@ function extractData(data) {
 }
 
 let timings = {
-  request: '???', // the naive approach used for the other metrics does not work: it seems to return totalTime * number of tests
+  request: '???', // Measuring accross async things give weird numbers
   parse: 0,
   process: 0,
 }

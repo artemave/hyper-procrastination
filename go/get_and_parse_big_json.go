@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -27,15 +28,18 @@ type Cities struct {
 	} `json:"features"`
 }
 
-func requestData(ch chan<- *Cities) {
+func requestData() io.Reader {
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
-	var data Cities
-	json.NewDecoder(res.Body).Decode(&data)
+	return res.Body
+}
 
-	ch <- &data
+func parseResponse(res io.Reader) *Cities {
+	var data Cities
+	json.NewDecoder(res).Decode(&data)
+	return &data
 }
 
 func extractData(data *Cities) {
@@ -46,17 +50,51 @@ func extractData(data *Cities) {
 	fmt.Printf("Some data %d\n", len(res))
 }
 
+type TimeSample struct {
+	Request float64
+	Parse   float64
+	Process float64
+}
+
 func main() {
 	start := time.Now()
 	var x [200]int
-
-	ch := make(chan *Cities)
-	for _ = range x {
-		go requestData(ch)
-	}
+	timings := make(chan TimeSample)
 
 	for _ = range x {
-		extractData(<-ch)
+		go func() {
+			t := TimeSample{}
+
+			s := time.Now()
+			response := requestData()
+			t.Request = time.Since(s).Seconds()
+
+			s = time.Now()
+			data := parseResponse(response)
+			t.Parse = time.Since(s).Seconds()
+
+			s = time.Now()
+			extractData(data)
+			t.Process = time.Since(s).Seconds()
+
+			timings <- t
+		}()
 	}
-	fmt.Printf("Time spent: %.2fs\n", time.Since(start).Seconds())
+
+	totalTimings := TimeSample{}
+	for _ = range x {
+		t := <-timings
+		totalTimings.Request += t.Request
+		totalTimings.Parse += t.Parse
+		totalTimings.Process += t.Process
+	}
+
+	end := time.Since(start).Seconds()
+
+	totalTimings.Request /= float64(len(x))
+	totalTimings.Parse /= float64(len(x))
+	totalTimings.Process /= float64(len(x))
+
+	fmt.Printf("Time spent: %.2fs request, %.2fs parse, %.2fs process, %.2fs total\n",
+		totalTimings.Request, totalTimings.Parse, totalTimings.Process, end)
 }
