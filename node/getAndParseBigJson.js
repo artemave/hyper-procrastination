@@ -1,4 +1,6 @@
 import httpism from 'httpism'
+import cluster from 'cluster'
+const numCPUs = require('os').cpus().length
 
 const url = `http://${process.env.NGINX_HOST || 'localhost'}/citylots.json`
 
@@ -17,28 +19,53 @@ function extractData(data) {
   }, {})
 }
 
-let timings = {
-  request: '???', // Measuring accross async things give weird numbers
-  parse: 0,
-  process: 0,
-}
-let startTime = new Date()
+const numberOfJobs = 200
 
-Promise.all(
-  Array.apply(null, {length: 200}).map(async () => {
-    const response = await getJson()
+if (cluster.isMaster) {
+  let startTime = new Date()
+  let workersLeft = numCPUs
+  let totalTimings = {
+    request: '???', // Measuring accross async things gives weird numbers
+    parse: 0,
+    process: 0,
+  }
 
-    let t = new Date()
-    const json = JSON.parse(response)
-    timings.parse += new Date() - t
+  Array.apply(null, {length: numCPUs}).map(() => {
+    return cluster.fork()
+  }).forEach(worker => {
+    worker.on('message', (message) => {
+      totalTimings.parse += message.parse
+      totalTimings.process += message.process
+      workersLeft--
 
-    t = new Date()
-    const data = extractData(json)
-    timings.process += new Date() - t
-
-    console.log("Some data: " + Object.keys(data).length);
+      if (workersLeft == 0) {
+        let totalTime = new Date() - startTime
+        console.log(`Time spent: ${totalTimings.request}ms request, ${totalTimings.parse / numCPUs}ms parse, ${totalTimings.process / numCPUs}ms process, ${totalTime}ms total`);
+        process.exit(0)
+      }
+    })
   })
-).then(() => {
-  let totalTime = new Date() - startTime
-  console.log(`Time spent: ${timings.request}ms request, ${timings.parse}ms parse, ${timings.process}ms process, ${totalTime}ms total`);
-})
+} else {
+  let timings = {
+    parse: 0,
+    process: 0,
+  }
+
+  Promise.all(
+    Array.apply(null, {length: numberOfJobs / numCPUs}).map(async () => {
+      const response = await getJson()
+
+      let t = new Date()
+      const json = JSON.parse(response)
+      timings.parse += new Date() - t
+
+      t = new Date()
+      const data = extractData(json)
+      timings.process += new Date() - t
+
+      console.log("Some data: " + Object.keys(data).length);
+    })
+  ).then(() => {
+    process.send(timings)
+  })
+}
