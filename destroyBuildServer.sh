@@ -13,4 +13,6 @@ until vagrant destroy &> /dev/null; do
   sleep 15
 done
 
+# TODO clean up ssh key
+
 echo "Build server successfully destroyed."

@@ -3,6 +3,7 @@ before_install:
   - wget https://releases.hashicorp.com/vagrant/1.9.2/vagrant_1.9.2_x86_64.deb
   - sudo dpkg -i vagrant_1.9.2_x86_64.deb
 script:
+  - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
   - vagrant up
 after_script:
   - ./destroyBuildServer.sh
