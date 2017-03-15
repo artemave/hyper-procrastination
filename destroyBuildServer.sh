@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 cnt=0
 
 until vagrant destroy &> /dev/null; do
@@ -13,6 +15,7 @@ until vagrant destroy &> /dev/null; do
   sleep 15
 done
 
-# TODO clean up ssh key
-
 echo "Build server successfully destroyed."
+
+SSHKEYID=$(curl -s -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/list | jq '.[] | select(.name == "vagrant") .SSHKEYID')
+curl -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/destroy --data "SSHKEYID=$SSHKEYID"
