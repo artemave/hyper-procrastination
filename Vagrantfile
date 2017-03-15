@@ -1,4 +1,4 @@
-required_plugins = %w(vagrant-vultr)
+required_plugins = %w(vagrant-vultr2)
 
 plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
 if not plugins_to_install.empty?

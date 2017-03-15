@@ -3,7 +3,7 @@
 cnt=0
 
 until vagrant destroy &> /dev/null; do
-  if [[ $cnt > 30 ]]; then
+  if ((cnt > 30)); then
     echo "Failed to destroy build server! This may get expensive."
     exit 1
   fi
