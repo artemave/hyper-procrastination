@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 cnt=0
 
 until vagrant destroy &> /dev/null; do
@@ -19,4 +17,9 @@ echo "Build server successfully destroyed."
 
 SSHKEYID=$(curl -s -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/list | jq --raw-output '.[] | select(.name == "vagrant") .SSHKEYID')
 
-curl -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/destroy --data "SSHKEYID=$SSHKEYID" || exit $?
+if ! curl -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/destroy --data "SSHKEYID=$SSHKEYID"; then
+  echo "Failed to remove SSH key from vultr. No further builds will pass."
+  exit 1
+fi
+
+echo "SSH key removed from vultr."

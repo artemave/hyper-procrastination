@@ -1,15 +1,13 @@
 sudo: required
 before_install:
-- wget https://releases.hashicorp.com/vagrant/1.9.2/vagrant_1.9.2_x86_64.deb
-- sudo dpkg -i vagrant_1.9.2_x86_64.deb
-- sudo apt-get install jq
+  - wget https://releases.hashicorp.com/vagrant/1.9.2/vagrant_1.9.2_x86_64.deb
+  - sudo dpkg -i vagrant_1.9.2_x86_64.deb
+  - sudo apt-get install jq
 script:
-- ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
-- vagrant up
+  - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+  - vagrant up
 after_script:
-- "./destroyBuildServer.sh"
-- "./publishStats.sh"
+  - "./destroyBuildServer.sh"
+  - "./publishStats.sh"
 env:
-  global:
-    # VULTR_TOKEN
-    - secure: JOa2bv3ezFMKlgV8iDnB3q9VeC277XSMf/2+RUHEsebugtca5AINcjOsgIgzqiLUXauSXSpnTyyCqJvtosfXq9vz0QuyjSrXUxFm/FJcom5CaIYBTJP4neurxpWpMwaDuo1VnoE04p3+/VKHWk+dAYXcfT+lFdYHRBXt98lL1S7p3gQ+ehV1ZsQFdP7BkQbrRXzjL82U3SxvvWmLJasAByFK/8sgGpBYrdLLbqohVCzl3ZXws/RQBTHaB0pt79dmDGBu1hzu4cfcUiweC0tMkNTjFjL53iV62UMdeWc/ebUvgiyzW2XGP9QL7zXL8Sp8Uyk134OrE969QXaBKTVwIbn3l/c7MxDE0GSzdVwf7gzv5cfTAWcuYfzaYnqs+JsONasIxju1xa0K8nGaPDu958o0pchLOMK5jZr17Wqz/EOok7WjWQn+/wmZ/WFF05UaO/mZyeNTl5dq/TDc5XU/gTiMtsJ2qNTymdyqETJCWQt2FhL4xFfcTP0mveOLJ8y74w+5t/YZfnOTZqJM5kMSjjRuf+t7yqewhBa7ZMwu60lxzRCiPW6ARKILTnvJePv4Mb0wxoW6/lHpyjN7W9tMtG0QzlUNk+02e+yNZlq7IYyIJwYzMb5OBgF7oomUKvLKdJFBcHHupTiq7VSujUhYdNj4FOJMYrNBUWNb5pPT/yY=
+  - VULTR_RATE_LIMIT_INTERVAL_MS=500
