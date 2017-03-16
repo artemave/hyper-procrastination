@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x
 
 cnt=0
 
@@ -18,4 +18,5 @@ done
 echo "Build server successfully destroyed."
 
 SSHKEYID=$(curl -s -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/list | jq --raw-output '.[] | select(.name == "vagrant") .SSHKEYID')
-curl -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/destroy --data "SSHKEYID=$SSHKEYID"
+
+curl -H "API-Key: $VULTR_TOKEN" https://api.vultr.com/v1/sshkey/destroy --data "SSHKEYID=$SSHKEYID" || exit $?
