@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
@@ -26,6 +28,10 @@ type Cities struct {
 			FROM_ST string `json:"FROM_ST"`
 		} `json:"properties"`
 	} `json:"features"`
+}
+
+func Round(f float64) float64 {
+	return math.Floor(f + .5)
 }
 
 func requestData() io.Reader {
@@ -51,9 +57,19 @@ func extractData(data *Cities) {
 }
 
 type TimeSample struct {
-	Request float64
-	Parse   float64
-	Process float64
+	Request float64 `json:"request"`
+	Parse   float64 `json:"parse"`
+	Process float64 `json:"process"`
+	Total   float64 `json:"total"`
+}
+
+func (ts TimeSample) Round() TimeSample {
+	return TimeSample{
+		Request: Round(ts.Request),
+		Parse:   Round(ts.Parse),
+		Process: Round(ts.Process),
+		Total:   Round(ts.Total),
+	}
 }
 
 func main() {
@@ -89,12 +105,22 @@ func main() {
 		totalTimings.Process += t.Process
 	}
 
-	end := time.Since(start).Seconds()
-
+	totalTimings.Total = time.Since(start).Seconds()
 	totalTimings.Request /= float64(len(x))
 	totalTimings.Parse /= float64(len(x))
 	totalTimings.Process /= float64(len(x))
 
 	fmt.Printf("Time spent: %.2fs request, %.2fs parse, %.2fs process, %.2fs total\n",
-		totalTimings.Request, totalTimings.Parse, totalTimings.Process, end)
+		totalTimings.Request, totalTimings.Parse, totalTimings.Process, totalTimings.Total)
+
+	results, err := json.Marshal(totalTimings.Round())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pwd, _ := os.Getwd()
+	err = ioutil.WriteFile(pwd+"/results.json", results, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

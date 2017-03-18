@@ -22,11 +22,13 @@ docker-compose run go # node ruby
 
 ### Rules
 
-- all files go in a subfolder named after the tech
+- all files go in a subfolder named after the new tech
 - test JSON - `cityloads.json` - should be requested over HTTP from the Nginx container bundled in this project
 - `docker-compose start tech` should run the test
-- local environment should not require presence of tech 
+- local development environment should not require presence of tech 
 - no caching
+- the results should be stored in `results.json` and mapped as volume in docker compose
+- `results.json` should look like this: `{"request":4574.575242000001,"parse":34947.504102000006,"process":2260.828687999999,"total":42772.572214}`
 
 You may find `docker-compose start nginx` useful in development. It starts nginx and binds it onto the host port 8889. 
 

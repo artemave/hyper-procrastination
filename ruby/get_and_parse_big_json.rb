@@ -24,7 +24,7 @@ class BM
 
   def method_missing meth
     key = meth.to_s.sub(/total_/, '')
-    @store[key.to_sym].round(2)
+    @store[key.to_sym]
   end
 end
 
@@ -61,4 +61,13 @@ $bm.sample :overall do
   hydra.run
 end
 
-puts "Time spent: #{$bm.total_request}s request, #{$bm.total_parse}s parse, #{$bm.total_process}s process, #{$bm.total_overall}s total"
+File.open(Dir.pwd + '/results.json', 'w') do |f|
+  f.write(JSON.dump(
+    request: $bm.total_request.round,
+    parse: $bm.total_parse.round,
+    process: $bm.total_process.round,
+    total: $bm.total_overall.round,
+  ))
+end
+
+puts "Time spent: #{$bm.total_request.round(2)}s request, #{$bm.total_parse.round(2)}s parse, #{$bm.total_process.round(2)}s process, #{$bm.total_overall.round(2)}s total"

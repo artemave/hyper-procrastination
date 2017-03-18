@@ -1,6 +1,7 @@
-import httpism from 'httpism'
-import cluster from 'cluster'
+const httpism = require('httpism')
+const cluster = require('cluster')
 const numCPUs = require('os').cpus().length
+const fs = require('fs')
 
 const url = `http://${process.env.NGINX_HOST || 'localhost'}/citylots.json`
 
@@ -15,6 +16,17 @@ function extractData(data) {
   return data.features.reduce((result, f) => {
     const key = f.properties.FROM_ST
     result[key] = result[key] ? result[key] + 1 : 1
+    return result
+  }, {})
+}
+
+function roundToSeconds(totalTimings) {
+  return Object.keys(totalTimings).reduce((result, key) => {
+    if (isNaN(totalTimings[key])) {
+      result[key] = totalTimings[key]
+    } else {
+      result[key] = Math.round(totalTimings[key] / 1000)
+    }
     return result
   }, {})
 }
@@ -39,8 +51,14 @@ if (cluster.isMaster) {
       workersLeft--
 
       if (workersLeft == 0) {
-        let totalTime = new Date() - startTime
-        console.log(`Time spent: ${totalTimings.request}ms request, ${totalTimings.parse / numCPUs}ms parse, ${totalTimings.process / numCPUs}ms process, ${totalTime}ms total`);
+        totalTimings.total = new Date() - startTime
+        totalTimings.parse = totalTimings.parse / numCPUs
+        totalTimings.process = totalTimings.process / numCPUs
+
+        console.log(`Time spent: ${totalTimings.request}ms request, ${totalTimings.parse}ms parse, ${totalTimings.process}ms process, ${totalTimings.total}ms total`);
+
+        fs.writeFileSync(process.cwd() + '/results.json', JSON.stringify(roundToSeconds(totalTimings)))
+
         process.exit(0)
       }
     })
