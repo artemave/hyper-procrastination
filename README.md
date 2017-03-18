@@ -2,7 +2,7 @@
 
 Compares speed of different server-side tech in a following test scenario: request a large JSON file 200 times concurrently, then reduce each response to some value.
 
-[![Results](https://s3.amazonaws.com/hyper-procrastination/results.svg)]()
+[![Results](https://s3.amazonaws.com/hyper-procrastination/results.svg)](https://travis-ci.org/artemave/hyper-procrastination)
 
 ## See for yourself
 
