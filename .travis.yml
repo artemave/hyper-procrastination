@@ -7,7 +7,8 @@ script:
   - ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
   - vagrant up
 after_script:
-  - "./destroyBuildServer.sh"
-  - "./publishStats.sh"
+  - vagrant rsync-back
+  - ./destroyBuildServer.sh
+  - ./publishStats.sh
 env:
   - VULTR_RATE_LIMIT_INTERVAL_MS=500

@@ -2,13 +2,7 @@
 
 Compares speed of different server-side tech in a following test scenario: request a large JSON file 200 times concurrently, then reduce each response to some value.
 
-Just to give you an idea, on my machine (2015 MBP 13" Core i7) the numbers are as follows:
-
-| Tech          | Request time | Parsing time | Processing time | Total time |
-| ------------- | -----------  | ------------ | --------------- | ---------- |
-| Node 7.4      | ???          |  8.32s       | 0.64s           | 13.84s     |
-| Go 1.7        | 2.38s        | 10.82s       | 0.09s           | 14.63s     |
-| Ruby 2.4      | 4.6s         | 34.9s        | 2.25s           | 42.55s     |
+[![Results](https://s3.amazonaws.com/hyper-procrastination/results.svg)]()
 
 ## See for yourself
 
@@ -28,7 +22,7 @@ docker-compose run go # node ruby
 - local development environment should not require presence of tech 
 - no caching
 - the results should be stored in `results.json` and mapped as volume in docker compose
-- `results.json` should look like this: `{"request":4574.575242000001,"parse":34947.504102000006,"process":2260.828687999999,"total":42772.572214}`
+- `results.json` should ideally look like this: `{"request":4,"parse":3,"process":22,"total":42}`, but at the very list contain `total:` time in seconds.
 
 You may find `docker-compose start nginx` useful in development. It starts nginx and binds it onto the host port 8889. 
 
