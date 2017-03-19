@@ -2,9 +2,11 @@
 
 Compares speed of different server-side tech in a following test scenario: request a large JSON file 200 times concurrently, then reduce each response to some value.
 
+Each push to master triggers a comparison test that runs on a [dedicated cloud server](https://www.vultr.com/pricing/dedicatedcloud/) (2 cpus, 8Gb ram). The results are then published here:
+
 [![Results](https://s3.amazonaws.com/hyper-procrastination/results.svg)](https://travis-ci.org/artemave/hyper-procrastination)
 
-## See for yourself
+## Try this at home
 
 Requires [docker-compose](https://docs.docker.com/compose/) and I'd say at least 4Gb of ram (may need docker settings change). Then:
 

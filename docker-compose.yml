@@ -13,18 +13,18 @@ services:
     depends_on:
       - nginx
     volumes:
-      - ./results/node.json:/app/results.json
+      - ./results:/app/results
   ruby:
     build:
       context: ./ruby
     depends_on:
       - nginx
     volumes:
-      - ./results/ruby.json:/app/results.json
+      - ./results:/app/results
   go:
     build:
       context: ./go
     depends_on:
       - nginx
     volumes:
-      - ./results/go.json:/go/src/app/results.json
+      - ./results:/go/src/app/results

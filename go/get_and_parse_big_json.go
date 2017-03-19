@@ -119,7 +119,7 @@ func main() {
 	}
 
 	pwd, _ := os.Getwd()
-	err = ioutil.WriteFile(pwd+"/results.json", results, 0644)
+	err = ioutil.WriteFile(pwd+"/results/go.json", results, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

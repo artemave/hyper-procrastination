@@ -4,7 +4,7 @@ WORKDIR /app
 ADD package.json .
 RUN npm i
 
-VOLUME /app
+VOLUME ./results
 
 ENV NGINX_HOST=nginx
 ADD . .

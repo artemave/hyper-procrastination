@@ -57,7 +57,7 @@ if (cluster.isMaster) {
 
         console.log(`Time spent: ${totalTimings.request}ms request, ${totalTimings.parse}ms parse, ${totalTimings.process}ms process, ${totalTimings.total}ms total`);
 
-        fs.writeFileSync(process.cwd() + '/results.json', JSON.stringify(roundToSeconds(totalTimings)))
+        fs.writeFileSync(process.cwd() + '/results/node.json', JSON.stringify(roundToSeconds(totalTimings)))
 
         process.exit(0)
       }

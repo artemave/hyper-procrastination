@@ -61,7 +61,7 @@ $bm.sample :overall do
   hydra.run
 end
 
-File.open(Dir.pwd + '/results.json', 'w') do |f|
+File.open(Dir.pwd + '/results/ruby.json', 'w') do |f|
   f.write(JSON.dump(
     request: $bm.total_request.round,
     parse: $bm.total_parse.round,
