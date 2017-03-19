@@ -16,6 +16,8 @@ function postToS3() {
     -H "Host: ${bucket}.s3.amazonaws.com" \
     -H "Date: ${dateValue}" \
     -H "Content-Type: ${contentType}" \
+    -H 'Cache-Control: no-cache' \
+    -H "Expires: ${dateValue}" \
     -H "Authorization: AWS ${s3Key}:${signature}" \
     "https://${bucket}.s3.amazonaws.com/${file}"
 }
