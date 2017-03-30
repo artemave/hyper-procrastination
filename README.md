@@ -4,7 +4,7 @@ Compares speed of different server-side tech in a following test scenario: reque
 
 Each push to master triggers a comparison test that runs on a [dedicated cloud server](https://www.vultr.com/pricing/dedicatedcloud/) (2 cpus, 8Gb ram). The results are then published here:
 
-[![Results](https://s3.amazonaws.com/hyper-procrastination/results.svg)](https://travis-ci.org/artemave/hyper-procrastination)
+<a href="https://travis-ci.org/artemave/hyper-procrastination"><img src="https://s3.amazonaws.com/hyper-procrastination/results.svg" align="left" height="150" width="375" ></a>
 
 ## Try this at home
 
