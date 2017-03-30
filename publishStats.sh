@@ -22,12 +22,12 @@ function postToS3() {
     "https://${bucket}.s3.amazonaws.com/${file}"
 }
 
-function join_by {
-  local d=$1
-  shift
-  echo -n "$1"
-  shift
-  printf "%s" "${@/#/$d}"
+function round() {
+  if [[ $1 =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+    printf "%0.1f" $1
+  else
+    echo -n $1
+  fi
 }
 
 results=()
@@ -35,21 +35,80 @@ results=()
 for file in ./results/*.json; do
   tech=$(basename "$file")
   tech=${tech%%.*}
-  total=$(cat "$file" | jq '.total')
-  results+=("$tech: ${total}s")
+  total=$(round $(cat "$file" | jq -r '.total'))
+  request=$(round $(cat "$file" | jq -r '.request'))
+  parse=$(round $(cat "$file" | jq -r '.parse'))
+  process=$(round $(cat "$file" | jq -r '.process'))
+  results+=("$tech $request $parse $process $total")
 done
 
 IFS=$'\n'
-sorted=($(sort -k2 -n <<<"${results[*]}"))
+sorted=($(sort -k5 -n <<<"${results[*]}"))
 unset IFS
 
-escaped=()
-for i in "${sorted[@]}"; do
-  escaped+=("${i// /%20}")
-done
+table_rows=$(for row in "${sorted[@]}"; do \
+  cell_values=($row)
+  echo "<tr>"
+    echo "<td>${cell_values[0]}</td>"
+    echo "<td class='value'>${cell_values[1]}s</td>"
+    echo "<td class='value'>${cell_values[2]}s</td>"
+    echo "<td class='value'>${cell_values[3]}s</td>"
+    echo "<td class='total value'>${cell_values[4]}s</td>"
+  echo "</tr>"
+done)
 
-url="https://img.shields.io/badge/results-$(join_by ',%20' ${escaped[@]})-green.svg"
-echo $url
-curl $url > results.svg
+cat << EOL > results.svg
+<?xml version="1.0" standalone="yes"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+  <foreignObject x="0" y="0" width="375" height="250">
+    <body xmlns="http://www.w3.org/1999/xhtml">
+      <style type="text/css" media="screen">
+        body {
+          font-family: arial;
+          margin: 0;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        tr {
+          border-bottom: 1px solid lightgrey;
+        }
+        th {
+          width: 20%;
+          background-color: lightcyan;
+          padding: 5px;
+        }
+        td {
+          padding: 5px;
+        }
+        .total {
+          font-weight: bold;
+        }
+        .value {
+          text-align: right;
+        }
+        .tech {
+          text-align: left;
+        }
+      </style>
+      <table>
+        <thead>
+          <tr>
+            <th class='tech'>Tech</th>
+            <th class='value'>Request</th>
+            <th class='value'>Parse</th>
+            <th class='value'>Process</th>
+            <th class='value'>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          $table_rows
+        </tbody>
+      </table>
+    </body>
+  </foreignObject>
+</svg>
+EOL
 
 postToS3 results.svg

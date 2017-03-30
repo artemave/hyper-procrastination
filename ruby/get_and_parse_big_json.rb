@@ -63,10 +63,10 @@ end
 
 File.open(Dir.pwd + '/results/ruby.json', 'w') do |f|
   f.write(JSON.dump(
-    request: $bm.total_request.round,
-    parse: $bm.total_parse.round,
-    process: $bm.total_process.round,
-    total: $bm.total_overall.round,
+    request: $bm.total_request,
+    parse: $bm.total_parse,
+    process: $bm.total_process,
+    total: $bm.total_overall,
   ))
 end
 

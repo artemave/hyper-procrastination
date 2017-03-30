@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"time"
@@ -28,10 +27,6 @@ type Cities struct {
 			FROM_ST string `json:"FROM_ST"`
 		} `json:"properties"`
 	} `json:"features"`
-}
-
-func Round(f float64) float64 {
-	return math.Floor(f + .5)
 }
 
 func requestData() io.Reader {
@@ -61,15 +56,6 @@ type TimeSample struct {
 	Parse   float64 `json:"parse"`
 	Process float64 `json:"process"`
 	Total   float64 `json:"total"`
-}
-
-func (ts TimeSample) Round() TimeSample {
-	return TimeSample{
-		Request: Round(ts.Request),
-		Parse:   Round(ts.Parse),
-		Process: Round(ts.Process),
-		Total:   Round(ts.Total),
-	}
 }
 
 func main() {
@@ -113,7 +99,7 @@ func main() {
 	fmt.Printf("Time spent: %.2fs request, %.2fs parse, %.2fs process, %.2fs total\n",
 		totalTimings.Request, totalTimings.Parse, totalTimings.Process, totalTimings.Total)
 
-	results, err := json.Marshal(totalTimings.Round())
+	results, err := json.Marshal(totalTimings)
 	if err != nil {
 		log.Fatal(err)
 	}

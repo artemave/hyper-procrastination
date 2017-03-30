@@ -20,17 +20,6 @@ function extractData(data) {
   }, {})
 }
 
-function roundToSeconds(totalTimings) {
-  return Object.keys(totalTimings).reduce((result, key) => {
-    if (isNaN(totalTimings[key])) {
-      result[key] = totalTimings[key]
-    } else {
-      result[key] = Math.round(totalTimings[key] / 1000)
-    }
-    return result
-  }, {})
-}
-
 const numberOfJobs = 200
 
 if (cluster.isMaster) {
@@ -51,13 +40,13 @@ if (cluster.isMaster) {
       workersLeft--
 
       if (workersLeft == 0) {
-        totalTimings.total = new Date() - startTime
-        totalTimings.parse = totalTimings.parse / numCPUs
-        totalTimings.process = totalTimings.process / numCPUs
+        totalTimings.total = (new Date() - startTime) / 1000
+        totalTimings.parse = (totalTimings.parse / numCPUs) / 1000
+        totalTimings.process = (totalTimings.process / numCPUs) / 1000
 
         console.log(`Time spent: ${totalTimings.request}ms request, ${totalTimings.parse}ms parse, ${totalTimings.process}ms process, ${totalTimings.total}ms total`);
 
-        fs.writeFileSync(process.cwd() + '/results/node.json', JSON.stringify(roundToSeconds(totalTimings)))
+        fs.writeFileSync(process.cwd() + '/results/node.json', JSON.stringify(totalTimings))
 
         process.exit(0)
       }
