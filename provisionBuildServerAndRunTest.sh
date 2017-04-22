@@ -33,3 +33,6 @@ docker-compose run go
 sleep 5
 echo "ruby test run"
 docker-compose run ruby
+sleep 5
+echo "elixir test run"
+docker-compose run elixir

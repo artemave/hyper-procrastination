@@ -28,3 +28,10 @@ services:
       - nginx
     volumes:
       - ./results:/go/src/app/results
+  elixir:
+    build:
+      context: ./elixir
+    depends_on:
+      - nginx
+    volumes:
+      - ./results:/app/results
