@@ -1,4 +1,4 @@
-FROM node:7.7
+FROM node:8.1
 
 WORKDIR /app
 ADD package.json .
@@ -8,4 +8,4 @@ VOLUME ./results
 
 ENV NGINX_HOST=nginx
 ADD . .
-CMD [ "npm", "start" ]
+CMD [ "node", "getAndParseBigJson.js" ]

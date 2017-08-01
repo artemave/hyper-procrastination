@@ -14,6 +14,8 @@ Requires [docker-compose](https://docs.docker.com/compose/) and I'd say at least
 docker-compose run go # node ruby
 ```
 
+You may need to bump up `ulimit` for the second profile https://blog.dekstroza.io/ulimit-shenanigans-on-osx-el-capitan/
+
 ## Add more tech
 
 ### Rules

@@ -1,8 +1,5 @@
 {
-  "scripts": {
-    "start": "node --max_old_space_size=4096 getAndParseBigJson.js"
-  },
   "dependencies": {
-    "httpism": "^2.7.0"
+    "promise-limit": "^2.4.0"
   }
 }

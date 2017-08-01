@@ -22,14 +22,20 @@ chmod +x /usr/local/bin/docker-compose
 
 cd /vagrant
 
-echo "Starting nginx"
-docker-compose start nginx
 sleep 5
-echo "node test run"
-docker-compose run node
+echo "node test run (profile 1)"
+docker-compose run --rm -v $(pwd)/test-profiles/1.json:/app/test-profile.json node
 sleep 5
-echo "go test run"
-docker-compose run go
+echo "node test run (profile 2)"
+docker-compose run --rm -v $(pwd)/test-profiles/2.json:/app/test-profile.json node
+
+sleep 5
+echo "go test run (profile 1)"
+docker-compose run --rm -v $(pwd)/test-profiles/1.json:/go/src/app/test-profile.json node
+sleep 5
+echo "go test run (profile 2)"
+docker-compose run --rm -v $(pwd)/test-profiles/2.json:/go/src/app/test-profile.json node
+
 sleep 5
 echo "ruby test run"
 docker-compose run ruby

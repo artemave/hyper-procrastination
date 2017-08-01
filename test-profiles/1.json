@@ -1,0 +1,6 @@
+{
+  "number": 1,
+  "numberOfJobs": 200,
+  "inputFile": "citylots.json",
+  "expectedNumberOfKeys": 1798
+}

@@ -11,14 +11,38 @@ import (
 	"time"
 )
 
+type TestProfile struct {
+	Number               int     `json:"number"`
+	InputFile            string  `json:"inputFile"`
+	NumberOfJobs         int     `json:"numberOfJobs"`
+	ExpectedNumberOfKeys int     `json:"expectedNumberOfKeys"`
+	Tech                 string  `json:"tech"`
+	TotalTime            float64 `json:"totalTime"`
+}
+
+func LoadTestProfile() TestProfile {
+	raw, err := ioutil.ReadFile("./test-profile.json")
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	var p TestProfile
+	json.Unmarshal(raw, &p)
+	return p
+}
+
 var url string
+var testProfile TestProfile
 
 func init() {
 	var nginxHost = os.Getenv("NGINX_HOST")
 	if nginxHost == "" {
 		nginxHost = "localhost"
 	}
-	url = "http://" + nginxHost + "/citylots.json"
+	testProfile = LoadTestProfile()
+	testProfile.Tech = "go"
+	url = "http://" + nginxHost + "/" + testProfile.InputFile
 }
 
 type Cities struct {
@@ -48,64 +72,42 @@ func extractData(data *Cities) {
 	for _, f := range data.Features {
 		res[f.Properties.FROM_ST]++
 	}
-	fmt.Printf("Some data %d\n", len(res))
-}
-
-type TimeSample struct {
-	Request float64 `json:"request"`
-	Parse   float64 `json:"parse"`
-	Process float64 `json:"process"`
-	Total   float64 `json:"total"`
+	if len(res) != testProfile.ExpectedNumberOfKeys {
+		log.Fatal(fmt.Sprintf("Expected %v to equal %v", len(res), testProfile.ExpectedNumberOfKeys))
+	}
 }
 
 func main() {
 	start := time.Now()
-	var x [200]int
-	timings := make(chan TimeSample)
+	var x = make([]int, testProfile.NumberOfJobs)
+	done := make(chan bool)
+
+	fmt.Println("Running...")
 
 	for _ = range x {
 		go func() {
-			t := TimeSample{}
-
-			s := time.Now()
 			response := requestData()
-			t.Request = time.Since(s).Seconds()
-
-			s = time.Now()
 			data := parseResponse(response)
-			t.Parse = time.Since(s).Seconds()
-
-			s = time.Now()
 			extractData(data)
-			t.Process = time.Since(s).Seconds()
-
-			timings <- t
+			done <- true
 		}()
 	}
 
-	totalTimings := TimeSample{}
 	for _ = range x {
-		t := <-timings
-		totalTimings.Request += t.Request
-		totalTimings.Parse += t.Parse
-		totalTimings.Process += t.Process
+		<-done
 	}
 
-	totalTimings.Total = time.Since(start).Seconds()
-	totalTimings.Request /= float64(len(x))
-	totalTimings.Parse /= float64(len(x))
-	totalTimings.Process /= float64(len(x))
+	testProfile.TotalTime = time.Since(start).Seconds()
 
-	fmt.Printf("Time spent: %.2fs request, %.2fs parse, %.2fs process, %.2fs total\n",
-		totalTimings.Request, totalTimings.Parse, totalTimings.Process, totalTimings.Total)
+	fmt.Printf("Time spent: %.2fs\n", testProfile.TotalTime)
 
-	results, err := json.Marshal(totalTimings)
+	results, err := json.Marshal(testProfile)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	pwd, _ := os.Getwd()
-	err = ioutil.WriteFile(pwd+"/results/go.json", results, 0644)
+	err = ioutil.WriteFile(fmt.Sprintf("%s/results/go-%v.json", pwd, testProfile.Number), results, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
